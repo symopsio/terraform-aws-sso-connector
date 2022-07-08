@@ -1,0 +1,40 @@
+version: 2.1
+
+
+
+jobs:
+  documentation:
+    docker:
+      - image: circleci/golang
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Install terraform-docs
+          command: GO111MODULE="on" go get github.com/terraform-docs/terraform-docs@latest
+      - run:
+          name: Configure github
+          command: |
+            git config user.email "infrastructure@symops.io"
+            git config user.name "infrastructure"
+      - run:
+          name: Run terraform docs
+          command: terraform-docs markdown table --output-file README.md --output-mode inject .
+      - run:
+          name: Check in documentation
+          command: |
+            git add README.md
+            git commit --allow-empty -m "[skip ci] Add auto-gen documentation."
+            git push https://infrastructure:${GITHUB_TOKEN}@github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git
+
+workflows:
+  version: 2
+  generate_docs:
+    jobs:
+      - documentation:
+          context:
+            - infrastructure-github-token
+          filters:
+            branches:
+              only: main
