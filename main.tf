@@ -69,7 +69,8 @@ resource "aws_iam_policy" "account" {
         {
             "Effect": "Allow",
             "Action": [
-                "iam:GetSAMLProvider"
+                "iam:GetSAMLProvider",
+                "iam:UpdateSAMLProvider"
             ],
             "Resource": "*"
         },
