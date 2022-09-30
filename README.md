@@ -8,7 +8,7 @@ Only the supplied `runtime_role_arns` are trusted to assume this role.
 
 ```hcl
 module "sso_connector" {
-  source  = "symopsio/sso-connector/sym"
+  source  = "symopsio/sso-connector/aws"
   version = ">= 1.0.0"
 
   environment = "sandbox"
