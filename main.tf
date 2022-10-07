@@ -26,7 +26,7 @@ resource "aws_iam_policy" "sso" {
   path = "/sym/"
 
   description = "Allows Sym to manage SSO escalations"
-  tags = var.tags
+  tags        = var.tags
   policy      = <<EOT
 {
     "Version": "2012-10-17",
@@ -63,7 +63,7 @@ resource "aws_iam_policy" "account" {
   path = "/sym/"
 
   description = "Additional permissions that allow Sym to assign permissions in the same AWS account as the SSO instance itself"
-  tags = var.tags
+  tags        = var.tags
   policy      = <<EOT
 {
     "Version": "2012-10-17",
