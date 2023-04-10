@@ -25,7 +25,7 @@ resource "aws_iam_policy" "sso" {
   name = "SymSSO${title(var.environment)}"
   path = "/sym/"
 
-  description = "Allows Sym to manage SSO escalations"
+  description = "Allows Sym to manage SSO Permission Set escalations"
   tags        = var.tags
   policy      = <<EOT
 {
@@ -43,6 +43,38 @@ resource "aws_iam_policy" "sso" {
             "Resource": "*"
         }
     ]
+}
+EOT
+}
+
+resource "aws_iam_role_policy_attachment" "sso_groups" {
+  policy_arn = aws_iam_policy.sso_groups.arn
+  role       = aws_iam_role.this.name
+}
+
+resource "aws_iam_policy" "sso_groups" {
+  name = "SymSSOGroup${title(var.environment)}"
+  path = "/sym/"
+
+  description = "Allows Sym to manage SSO Group escalations"
+  tags        = var.tags
+  policy      = <<EOT
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "identitystore:CreateGroupMembership",
+        "identitystore:DeleteGroupMembership",
+        "identitystore:Describe*",
+        "identitystore:Get*",
+        "identitystore:IsMemberInGroups",
+        "identitystore:List*"
+      ],
+      "Resource": "*"
+    }
+  ]
 }
 EOT
 }
