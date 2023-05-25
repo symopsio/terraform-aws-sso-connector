@@ -1,3 +1,10 @@
+data "aws_ssoadmin_instances" "this" {}
+data "aws_caller_identity" "current" {}
+
+locals {
+  instance_arn = one(data.aws_ssoadmin_instances.this.arns)
+}
+
 resource "aws_iam_role" "this" {
   name = "SymSSO${title(var.environment)}"
   path = "/sym/"
@@ -79,14 +86,40 @@ resource "aws_iam_policy" "sso_groups" {
 EOT
 }
 
+resource "aws_iam_role_policy_attachment" "list_accounts" {
+  policy_arn = aws_iam_policy.list_accounts.arn
+  role       = aws_iam_role.this.name
+}
+
+resource "aws_iam_policy" "list_accounts" {
+  name = "SymListAccounts${title(var.environment)}"
+  path = "/sym/"
+
+  description = "Allows Sym to List Accounts in the AWS Organization"
+  tags        = var.tags
+  policy      = <<EOT
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "organizations:ListAccounts",
+        "organizations:ListAccountsForParent"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+EOT
+}
+
 resource "aws_iam_role_policy_attachment" "account" {
   count = var.sso_account_assignment_enabled ? 1 : 0
 
   policy_arn = aws_iam_policy.account[0].arn
   role       = aws_iam_role.this.name
 }
-
-data "aws_caller_identity" "current" {}
 
 resource "aws_iam_policy" "account" {
   count = var.sso_account_assignment_enabled ? 1 : 0
@@ -122,10 +155,4 @@ resource "aws_iam_policy" "account" {
     ]
 }
 EOT
-}
-
-data "aws_ssoadmin_instances" "this" {}
-
-locals {
-  instance_arn = tolist(data.aws_ssoadmin_instances.this.arns)[0]
 }
