@@ -2,7 +2,7 @@ data "aws_ssoadmin_instances" "this" {}
 data "aws_caller_identity" "current" {}
 
 locals {
-  instance_arn = one(data.aws_ssoadmin_instances.this.arns)
+  instance_arn = tolist(data.aws_ssoadmin_instances.this.arns)[0]
 }
 
 resource "aws_iam_role" "this" {
