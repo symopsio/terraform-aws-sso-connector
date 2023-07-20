@@ -144,6 +144,7 @@ resource "aws_iam_policy" "account" {
         {
             "Effect": "Allow",
             "Action": [
+                "iam:AttachRolePolicy",
                 "iam:CreateRole",
                 "iam:GetRole",
                 "iam:ListAttachedRolePolicies",
